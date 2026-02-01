@@ -5,7 +5,7 @@ function App() {
   const [nombre, setNombre] = useState('');
   const [id, setId] = useState('');
   // REEMPLAZA ESTA URL POR LA DE TU BACKEND EN AZURE
-  const API_URL = "computacionbackend-cxbbheaegpb2agd3.spaincentral-01.azurewebsites.net";
+  const API_URL = "https://computacionbackend-cxbbheaegpb2agd3.spaincentral-01.azurewebsites.net";
 
   // Función para obtener los usuarios
   const obtenerUsuarios = async () => {
