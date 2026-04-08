@@ -35,6 +35,26 @@ function App() {
     }
   };
 
+  //Función Eliminar datos
+  const eliminarUsuario = async (id) => {
+  const confirmar = window.confirm(`¿Seguro que quieres eliminar el usuario con id ${id}?`);
+  if (!confirmar) return;
+
+  try {
+    const res = await fetch(`${API_URL}/usuarios/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      throw new Error('No se pudo eliminar el usuario');
+    }
+
+    obtenerUsuarios(); // refresca la lista
+  } catch (err) {
+    console.error("Error al eliminar:", err);
+  }
+};
+
   useEffect(() => { obtenerUsuarios(); }, []);
 
   return (
@@ -49,8 +69,13 @@ function App() {
 
       <h2>Lista de Equipos</h2>
       <ul>
-        {usuarios.map(u => (
-          <li key={u.id}>{u.nombre}</li>
+        {usuarios.map((u) => (
+          <li key={u.id}>
+            {u.nombre} (ID: {u.id})
+              <button onClick={() => eliminarUsuario(u.id)}>
+                Eliminar
+              </button>
+          </li>
         ))}
       </ul>
     </div>
