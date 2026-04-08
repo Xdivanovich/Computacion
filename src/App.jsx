@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 function App() {
   const [cartas, setCartas] = useState([]);
-  const [tipo, setTipo] = useState('arma');
+  const [tipoCarta, setTipoCarta] = useState('arma');
   const [nombre, setNombre] = useState('');
   const [equipo, setEquipo] = useState('amantes');
   const [poder, setPoder] = useState('');
   const [bonificador, setBonificador] = useState('');
   const [arma, setArma] = useState('Kette');
+  const [tipoArma, setTipoArma] = useState('Kette');
   const [descripcion, setDescripcion] = useState('');
 
   const API_URL = "https://computacionbackend-cxbbheaegpb2agd3.spaincentral-01.azurewebsites.net";
@@ -26,9 +27,9 @@ function App() {
     e.preventDefault();
 
     const body =
-      tipo === 'jugador'
+      tipoCarta === 'jugador'
         ? {
-            tipo,
+            tipo: tipoCarta,
             nombre,
             equipo,
             poder: parseInt(poder, 10),
@@ -36,8 +37,9 @@ function App() {
             descripcion
           }
         : {
-            tipo,
+            tipo: tipoCarta,
             nombre,
+            tipoArma,
             bonificador: parseInt(bonificador, 10),
             descripcion
           };
@@ -53,12 +55,13 @@ function App() {
         throw new Error("No se pudo crear la carta");
       }
 
-      setTipo('arma');
+      setTipoCarta('arma');
       setNombre('');
       setEquipo('amantes');
       setPoder('');
       setBonificador('');
       setArma('Kette');
+      setTipoArma('Kette');
       setDescripcion('');
       obtenerCartas();
     } catch (err) {
@@ -96,11 +99,11 @@ function App() {
       <form onSubmit={crearCarta} style={{ marginBottom: '30px' }}>
         <div style={{ marginBottom: '12px' }}>
           <label>
-            Tipo:
+            Arma o jugador:
             <br />
             <select
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
+              value={tipoCarta}
+              onChange={(e) => setTipoCarta(e.target.value)}
               required
               style={{ width: '100%', padding: '8px', marginTop: '4px' }}
             >
@@ -125,7 +128,7 @@ function App() {
           </label>
         </div>
 
-        {tipo === 'jugador' && (
+        {tipoCarta === 'jugador' && (
           <>
             <div style={{ marginBottom: '12px' }}>
               <label>
@@ -181,21 +184,44 @@ function App() {
           </>
         )}
 
-        {tipo === 'arma' && (
-          <div style={{ marginBottom: '12px' }}>
-            <label>
-              Bonificador:
-              <br />
-              <input
-                type="number"
-                placeholder="Bonificador"
-                value={bonificador}
-                onChange={(e) => setBonificador(e.target.value)}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-              />
-            </label>
-          </div>
+        {tipoCarta === 'arma' && (
+          <>
+            <div style={{ marginBottom: '12px' }}>
+              <label>
+                Tipo:
+                <br />
+                <select
+                  value={tipoArma}
+                  onChange={(e) => setTipoArma(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                >
+                  <option value="Kette">Kette</option>
+                  <option value="Stab">Stab</option>
+                  <option value="Corredor">Corredor</option>
+                  <option value="Qtip">Qtip</option>
+                  <option value="Duales">Duales</option>
+                  <option value="SNS">SNS</option>
+                  <option value="Mandoble">Mandoble</option>
+                </select>
+              </label>
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <label>
+                Bonificador:
+                <br />
+                <input
+                  type="number"
+                  placeholder="Bonificador"
+                  value={bonificador}
+                  onChange={(e) => setBonificador(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                />
+              </label>
+            </div>
+          </>
         )}
 
         <div style={{ marginBottom: '12px' }}>
@@ -238,7 +264,7 @@ function App() {
               <br />
               ID: {carta.id}
               <br />
-              Tipo: {carta.tipo}
+              Tipo de carta: {carta.tipo}
               <br />
 
               {carta.tipo === 'jugador' ? (
@@ -252,6 +278,8 @@ function App() {
                 </>
               ) : (
                 <>
+                  Tipo: {carta.tipoArma}
+                  <br />
                   Bonificador: {carta.bonificador}
                   <br />
                 </>
