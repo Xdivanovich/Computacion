@@ -1,80 +1,133 @@
 import React, { useState, useEffect } from 'react';
 
 function App() {
-  const [usuarios, setUsuarios] = useState([]);
+  const [equipos, setEquipos] = useState([]);
   const [nombre, setNombre] = useState('');
-  const [id, setId] = useState('');
-  // REEMPLAZA ESTA URL POR LA DE TU BACKEND EN AZURE
+  const [jugadores, setJugadores] = useState('');
+  const [puntos, setPuntos] = useState('');
+
   const API_URL = "https://computacionbackend-cxbbheaegpb2agd3.spaincentral-01.azurewebsites.net";
 
-  // Función para obtener los usuarios
-  const obtenerUsuarios = async () => {
+  const obtenerEquipos = async () => {
     try {
-      const res = await fetch(`${API_URL}/usuarios`);
+      const res = await fetch(`${API_URL}/equipos`);
       const data = await res.json();
-      setUsuarios(data);
+      setEquipos(data);
     } catch (err) {
-      console.error("Error al obtener:", err);
+      console.error("Error al obtener equipos:", err);
     }
   };
 
-  // Función para crear un usuario
-  const crearUsuario = async (e) => {
+  const crearEquipo = async (e) => {
     e.preventDefault();
+
+    const jugadoresArray = jugadores
+      .split(',')
+      .map(j => j.trim())
+      .filter(j => j !== '');
+
     try {
-      await fetch(`${API_URL}/usuarios`, {
+      const res = await fetch(`${API_URL}/equipos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, nombre })
+        body: JSON.stringify({
+          nombre,
+          jugadores: jugadoresArray,
+          puntos: parseInt(puntos, 10)
+        })
       });
+
+      if (!res.ok) {
+        throw new Error("No se pudo crear el equipo");
+      }
+
       setNombre('');
-      setId('');
-      obtenerUsuarios(); // Refrescar lista
+      setJugadores('');
+      setPuntos('');
+      obtenerEquipos();
     } catch (err) {
-      console.error("Error al crear:", err);
+      console.error("Error al crear equipo:", err);
     }
   };
 
-  //Función Eliminar datos
-  const eliminarUsuario = async (id) => {
-  const confirmar = window.confirm(`¿Seguro que quieres eliminar el usuario con id ${id}?`);
-  if (!confirmar) return;
+  const eliminarEquipo = async (id) => {
+    const confirmar = window.confirm(`¿Seguro que quieres eliminar el equipo con id ${id}?`);
+    if (!confirmar) return;
 
-  try {
-    const res = await fetch(`${API_URL}/usuarios/${id}`, {
-      method: 'DELETE',
-    });
+    try {
+      const res = await fetch(`${API_URL}/equipos/${id}`, {
+        method: 'DELETE',
+      });
 
-    if (!res.ok) {
-      throw new Error('No se pudo eliminar el usuario');
+      if (!res.ok) {
+        throw new Error("No se pudo eliminar el equipo");
+      }
+
+      obtenerEquipos();
+    } catch (err) {
+      console.error("Error al eliminar equipo:", err);
     }
+  };
 
-    obtenerUsuarios(); // refresca la lista
-  } catch (err) {
-    console.error("Error al eliminar:", err);
-  }
-};
-
-  useEffect(() => { obtenerUsuarios(); }, []);
+  useEffect(() => {
+    obtenerEquipos();
+  }, []);
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Búsqueda de Equipos</h1>
-      
-      <form onSubmit={crearUsuario} style={{ marginBottom: '2rem' }}>
-        <input placeholder="ID" value={id} onChange={e => setId(e.target.value)} required />
-        <input placeholder="Nombre" value={nombre} onChange={e => setNombre(e.target.value)} required />
-        <button type="submit">Crear Usuario</button>
+    <div style={{ padding: '20px' }}>
+      <h1>Gestión de Equipos</h1>
+
+      <form onSubmit={crearEquipo} style={{ marginBottom: '30px' }}>
+        <div>
+          <input
+            type="text"
+            placeholder="Nombre del equipo"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <input
+            type="text"
+            placeholder="Jugadores separados por comas"
+            value={jugadores}
+            onChange={(e) => setJugadores(e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <input
+            type="number"
+            placeholder="Puntos"
+            value={puntos}
+            onChange={(e) => setPuntos(e.target.value)}
+            required
+          />
+        </div>
+
+        <button type="submit">Crear equipo</button>
       </form>
 
-      <h2>Lista de Equipos</h2>
+      <h2>Ranking de Equipos</h2>
       <ul>
-        {usuarios.map((u) => (
-          <li key={u.id}>
-            {u.nombre} (ID: {u.id})
-              <button onClick={() => eliminarUsuario(u.id)}>
-                Eliminar
-              </button>
+        {equipos.map((equipo, index) => (
+          <li key={equipo.id} style={{ marginBottom: '15px' }}>
+            <strong>
+              #{index + 1} - {equipo.nombre}
+            </strong>
+            <br />
+            ID: {equipo.id}
+            <br />
+            Puntos: {equipo.puntos}
+            <br />
+            Jugadores: {equipo.jugadores?.join(', ')}
+            <br />
+            <button onClick={() => eliminarEquipo(equipo.id)}>
+              Eliminar
+            </button>
           </li>
         ))}
       </ul>
