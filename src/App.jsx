@@ -6,6 +6,8 @@ function App() {
   const [nombre, setNombre] = useState('');
   const [equipo, setEquipo] = useState('amantes');
   const [poder, setPoder] = useState('');
+  const [bonificador, setBonificador] = useState('');
+  const [arma, setArma] = useState('Kette');
   const [descripcion, setDescripcion] = useState('');
 
   const API_URL = "https://computacionbackend-cxbbheaegpb2agd3.spaincentral-01.azurewebsites.net";
@@ -23,17 +25,28 @@ function App() {
   const crearCarta = async (e) => {
     e.preventDefault();
 
+    const body =
+      tipo === 'jugador'
+        ? {
+            tipo,
+            nombre,
+            equipo,
+            poder: parseInt(poder, 10),
+            arma,
+            descripcion
+          }
+        : {
+            tipo,
+            nombre,
+            bonificador: parseInt(bonificador, 10),
+            descripcion
+          };
+
     try {
       const res = await fetch(`${API_URL}/cartas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tipo,
-          nombre,
-          equipo,
-          poder: parseInt(poder, 10),
-          descripcion
-        })
+        body: JSON.stringify(body)
       });
 
       if (!res.ok) {
@@ -44,6 +57,8 @@ function App() {
       setNombre('');
       setEquipo('amantes');
       setPoder('');
+      setBonificador('');
+      setArma('Kette');
       setDescripcion('');
       obtenerCartas();
     } catch (err) {
@@ -110,36 +125,78 @@ function App() {
           </label>
         </div>
 
-        <div style={{ marginBottom: '12px' }}>
-          <label>
-            Equipo:
-            <br />
-            <select
-              value={equipo}
-              onChange={(e) => setEquipo(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-            >
-              <option value="amantes">Amantes</option>
-              <option value="botillo">Botillo</option>
-            </select>
-          </label>
-        </div>
+        {tipo === 'jugador' && (
+          <>
+            <div style={{ marginBottom: '12px' }}>
+              <label>
+                Equipo:
+                <br />
+                <select
+                  value={equipo}
+                  onChange={(e) => setEquipo(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                >
+                  <option value="amantes">Amantes</option>
+                  <option value="botillo">Botillo</option>
+                </select>
+              </label>
+            </div>
 
-        <div style={{ marginBottom: '12px' }}>
-          <label>
-            Poder:
-            <br />
-            <input
-              type="number"
-              placeholder="Poder"
-              value={poder}
-              onChange={(e) => setPoder(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-            />
-          </label>
-        </div>
+            <div style={{ marginBottom: '12px' }}>
+              <label>
+                Arma:
+                <br />
+                <select
+                  value={arma}
+                  onChange={(e) => setArma(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                >
+                  <option value="Kette">Kette</option>
+                  <option value="Stab">Stab</option>
+                  <option value="Corredor">Corredor</option>
+                  <option value="Qtip">Qtip</option>
+                  <option value="Duales">Duales</option>
+                  <option value="SNS">SNS</option>
+                  <option value="Mandoble">Mandoble</option>
+                </select>
+              </label>
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <label>
+                Poder:
+                <br />
+                <input
+                  type="number"
+                  placeholder="Poder"
+                  value={poder}
+                  onChange={(e) => setPoder(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                />
+              </label>
+            </div>
+          </>
+        )}
+
+        {tipo === 'arma' && (
+          <div style={{ marginBottom: '12px' }}>
+            <label>
+              Bonificador:
+              <br />
+              <input
+                type="number"
+                placeholder="Bonificador"
+                value={bonificador}
+                onChange={(e) => setBonificador(e.target.value)}
+                required
+                style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+              />
+            </label>
+          </div>
+        )}
 
         <div style={{ marginBottom: '12px' }}>
           <label>
@@ -183,10 +240,23 @@ function App() {
               <br />
               Tipo: {carta.tipo}
               <br />
-              Equipo: {carta.equipo}
-              <br />
-              Poder: {carta.poder}
-              <br />
+
+              {carta.tipo === 'jugador' ? (
+                <>
+                  Equipo: {carta.equipo}
+                  <br />
+                  Arma: {carta.arma}
+                  <br />
+                  Poder: {carta.poder}
+                  <br />
+                </>
+              ) : (
+                <>
+                  Bonificador: {carta.bonificador}
+                  <br />
+                </>
+              )}
+
               Descripción:
               <br />
               <span style={{ whiteSpace: 'pre-wrap' }}>{carta.descripcion}</span>
