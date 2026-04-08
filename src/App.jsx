@@ -39,7 +39,7 @@ function App() {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Gestión de Usuarios (Azure)</h1>
+      <h1>Búsqueda de Equipos</h1>
       
       <form onSubmit={crearUsuario} style={{ marginBottom: '2rem' }}>
         <input placeholder="ID" value={id} onChange={e => setId(e.target.value)} required />
@@ -47,10 +47,10 @@ function App() {
         <button type="submit">Crear Usuario</button>
       </form>
 
-      <h2>Lista de Usuarios</h2>
+      <h2>Lista de Equipos</h2>
       <ul>
         {usuarios.map(u => (
-          <li key={u.id}>{u.nombre} (ID: {u.id})</li>
+          <li key={u.id}>{u.nombre}</li>
         ))}
       </ul>
     </div>
