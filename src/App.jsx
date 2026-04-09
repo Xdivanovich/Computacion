@@ -341,7 +341,7 @@ function App() {
     }
 
     // Límite: 300 KB
-    const maxBytes = 300 * 1024;
+    const maxBytes = 1024 * 1024;
 
     if (archivo.size > maxBytes) {
       alert('La imagen es demasiado grande. Usa una de menos de 300 KB.');
@@ -364,8 +364,7 @@ function App() {
     const archivo = e.target.files?.[0];
     if (!archivo) return;
 
-    const maxBytes = 300 * 1024;
-
+    const maxBytes = 1024 * 1024;
     if (archivo.size > maxBytes) {
       alert('La imagen es demasiado grande. Usa una de menos de 300 KB.');
       e.target.value = '';
