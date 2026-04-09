@@ -28,7 +28,7 @@ function App() {
 
   const [tipoCarta, setTipoCarta] = useState('arma');
   const [nombre, setNombre] = useState('');
-  const [equipo, setEquipo] = useState('amantes');
+  const [equipo, setEquipo] = useState('amantes bandidos');
   const [poder, setPoder] = useState('');
   const [bonificador, setBonificador] = useState('');
   const [arma, setArma] = useState('Kette');
@@ -42,7 +42,7 @@ function App() {
 
   const [editTipo, setEditTipo] = useState('arma');
   const [editNombre, setEditNombre] = useState('');
-  const [editEquipo, setEditEquipo] = useState('amantes');
+  const [editEquipo, setEditEquipo] = useState('amantes bandidos');
   const [editPoder, setEditPoder] = useState('');
   const [editBonificador, setEditBonificador] = useState('');
   const [editArma, setEditArma] = useState('Kette');
@@ -77,7 +77,7 @@ function App() {
   const limpiarFormularioCrear = () => {
     setTipoCarta('arma');
     setNombre('');
-    setEquipo('amantes');
+    setEquipo('amantes bandidos');
     setPoder('');
     setBonificador('');
     setArma('Kette');
@@ -93,7 +93,7 @@ function App() {
   const cargarCartaEnFormularioEdicion = (carta) => {
     setEditTipo(carta.tipo || 'arma');
     setEditNombre(carta.nombre || '');
-    setEditEquipo(carta.equipo || 'amantes');
+    setEditEquipo(carta.equipo || 'amantes bandidos');
     setEditPoder(carta.poder ?? '');
     setEditBonificador(carta.bonificador ?? '');
     setEditArma(carta.arma || 'Kette');
@@ -513,8 +513,9 @@ function App() {
                       required
                       style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                     >
-                      <option value="amantes">Amantes</option>
-                      <option value="botillo">Botillo</option>
+                      <option value="amantes bandidos">Amantes Bandidos</option>
+                      <option value="botillo">Botillo Warriors</option>
+                      <option value="charlie">Charlie</option>
                     </select>
                   </label>
                 </div>
@@ -699,8 +700,9 @@ function App() {
                   required
                   style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                 >
-                  <option value="amantes">Amantes</option>
-                  <option value="botillo">Botillo</option>
+                  <option value="amantes bandidos">Amantes Bandidos</option>
+                  <option value="botillo">Botillo Warriors</option>
+                  <option value="charlie">Charlie</option>
                 </select>
               </label>
             </div>
