@@ -193,7 +193,55 @@ function App() {
       obtenerCartas();
     } catch (err) {
       console.error('Error al crear carta:', err);
-      alert('Error al crear carta. Revisa que todos los campos estén completos.');
+      const crearCarta = async (e) => {
+  e.preventDefault();
+
+  const body =
+    tipoCarta === 'jugador'
+      ? {
+          tipo: tipoCarta,
+          nombre,
+          equipo,
+          poder: Number(poder),
+          arma,
+          tipoArma: null,
+          bonificador: null,
+          descripcion,
+          imagen
+        }
+      : {
+          tipo: tipoCarta,
+          nombre,
+          equipo: null,
+          poder: null,
+          arma: null,
+          tipoArma,
+          bonificador: Number(bonificador),
+          descripcion,
+          imagen
+        };
+
+  try {
+    const res = await fetch(`${API_URL}/cartas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const texto = await res.text();
+
+    if (!res.ok) {
+      throw new Error(texto || 'No se pudo crear la carta');
+    }
+
+    limpiarFormularioCrear();
+    obtenerCartas();
+    alert('Carta creada correctamente');
+  } catch (err) {
+    console.error('Error al crear carta:', err);
+    alert(`Error real al crear carta: ${err.message}`);
+  }
+};
     }
   };
 
@@ -285,9 +333,19 @@ function App() {
   // =========================
 
   // Cuando el usuario selecciona una imagen en el formulario de crear
-  const manejarImagenCrear = async (e) => {
+    const manejarImagenCrear = async (e) => {
     const archivo = e.target.files?.[0];
     if (!archivo) {
+      setImagen('');
+      return;
+    }
+
+    // Límite: 300 KB
+    const maxBytes = 300 * 1024;
+
+    if (archivo.size > maxBytes) {
+      alert('La imagen es demasiado grande. Usa una de menos de 300 KB.');
+      e.target.value = '';
       setImagen('');
       return;
     }
@@ -302,9 +360,15 @@ function App() {
   };
 
   // Cuando el usuario selecciona una imagen en el formulario de editar
-  const manejarImagenEditar = async (e) => {
+    const manejarImagenEditar = async (e) => {
     const archivo = e.target.files?.[0];
-    if (!archivo) {
+    if (!archivo) return;
+
+    const maxBytes = 300 * 1024;
+
+    if (archivo.size > maxBytes) {
+      alert('La imagen es demasiado grande. Usa una de menos de 300 KB.');
+      e.target.value = '';
       return;
     }
 
