@@ -10,8 +10,11 @@ function App() {
   const [arma, setArma] = useState('Kette');
   const [tipoArma, setTipoArma] = useState('Kette');
   const [descripcion, setDescripcion] = useState('');
+  const [imagen, setImagen] = useState('');
 
   const API_URL = "https://computacionbackend-cxbbheaegpb2agd3.spaincentral-01.azurewebsites.net";
+
+  const opcionesArma = ['Kette', 'Stab', 'Corredor', 'Qtip', 'Duales', 'SNS', 'Mandoble'];
 
   const obtenerCartas = async () => {
     try {
@@ -19,7 +22,32 @@ function App() {
       const data = await res.json();
       setCartas(data);
     } catch (err) {
-      console.error("Error al obtener cartas:", err);
+      console.error('Error al obtener cartas:', err);
+    }
+  };
+
+  const convertirImagenABase64 = (archivo) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(archivo);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const manejarCambioImagen = async (e) => {
+    const archivo = e.target.files?.[0];
+    if (!archivo) {
+      setImagen('');
+      return;
+    }
+
+    try {
+      const imagenBase64 = await convertirImagenABase64(archivo);
+      setImagen(imagenBase64);
+    } catch (error) {
+      console.error('Error al leer la imagen:', error);
+      alert('No se pudo cargar la imagen.');
     }
   };
 
@@ -34,14 +62,16 @@ function App() {
             equipo,
             poder: parseInt(poder, 10),
             arma,
-            descripcion
+            descripcion,
+            imagen
           }
         : {
             tipo: tipoCarta,
             nombre,
             tipoArma,
             bonificador: parseInt(bonificador, 10),
-            descripcion
+            descripcion,
+            imagen
           };
 
     try {
@@ -52,7 +82,7 @@ function App() {
       });
 
       if (!res.ok) {
-        throw new Error("No se pudo crear la carta");
+        throw new Error('No se pudo crear la carta');
       }
 
       setTipoCarta('arma');
@@ -63,9 +93,14 @@ function App() {
       setArma('Kette');
       setTipoArma('Kette');
       setDescripcion('');
+      setImagen('');
+
+      const inputFile = document.getElementById('imagenCarta');
+      if (inputFile) inputFile.value = '';
+
       obtenerCartas();
     } catch (err) {
-      console.error("Error al crear carta:", err);
+      console.error('Error al crear carta:', err);
     }
   };
 
@@ -79,12 +114,12 @@ function App() {
       });
 
       if (!res.ok) {
-        throw new Error("No se pudo eliminar la carta");
+        throw new Error('No se pudo eliminar la carta');
       }
 
       obtenerCartas();
     } catch (err) {
-      console.error("Error al eliminar carta:", err);
+      console.error('Error al eliminar carta:', err);
     }
   };
 
@@ -93,10 +128,29 @@ function App() {
   }, []);
 
   return (
-    <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Gestión de Cartas</h1>
+    <div
+      style={{
+        padding: '20px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        fontFamily: 'Arial, sans-serif',
+        color: '#f5f5f5',
+        backgroundColor: '#0f1117',
+        minHeight: '100vh'
+      }}
+    >
+      <h1 style={{ marginBottom: '24px' }}>Gestión de Cartas</h1>
 
-      <form onSubmit={crearCarta} style={{ marginBottom: '30px' }}>
+      <form
+        onSubmit={crearCarta}
+        style={{
+          marginBottom: '40px',
+          background: '#1a1f2b',
+          padding: '20px',
+          borderRadius: '12px',
+          border: '1px solid #2d3445'
+        }}
+      >
         <div style={{ marginBottom: '12px' }}>
           <label>
             Arma o jugador:
@@ -105,7 +159,7 @@ function App() {
               value={tipoCarta}
               onChange={(e) => setTipoCarta(e.target.value)}
               required
-              style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+              style={{ width: '100%', padding: '10px', marginTop: '4px' }}
             >
               <option value="arma">Arma</option>
               <option value="jugador">Jugador</option>
@@ -123,7 +177,7 @@ function App() {
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               required
-              style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+              style={{ width: '100%', padding: '10px', marginTop: '4px' }}
             />
           </label>
         </div>
@@ -138,7 +192,7 @@ function App() {
                   value={equipo}
                   onChange={(e) => setEquipo(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                 >
                   <option value="amantes">Amantes</option>
                   <option value="botillo">Botillo</option>
@@ -154,15 +208,13 @@ function App() {
                   value={arma}
                   onChange={(e) => setArma(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                 >
-                  <option value="Kette">Kette</option>
-                  <option value="Stab">Stab</option>
-                  <option value="Corredor">Corredor</option>
-                  <option value="Qtip">Qtip</option>
-                  <option value="Duales">Duales</option>
-                  <option value="SNS">SNS</option>
-                  <option value="Mandoble">Mandoble</option>
+                  {opcionesArma.map((opcion) => (
+                    <option key={opcion} value={opcion}>
+                      {opcion}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
@@ -177,7 +229,7 @@ function App() {
                   value={poder}
                   onChange={(e) => setPoder(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                 />
               </label>
             </div>
@@ -194,15 +246,13 @@ function App() {
                   value={tipoArma}
                   onChange={(e) => setTipoArma(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                 >
-                  <option value="Kette">Kette</option>
-                  <option value="Stab">Stab</option>
-                  <option value="Corredor">Corredor</option>
-                  <option value="Qtip">Qtip</option>
-                  <option value="Duales">Duales</option>
-                  <option value="SNS">SNS</option>
-                  <option value="Mandoble">Mandoble</option>
+                  {opcionesArma.map((opcion) => (
+                    <option key={opcion} value={opcion}>
+                      {opcion}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
@@ -217,7 +267,7 @@ function App() {
                   value={bonificador}
                   onChange={(e) => setBonificador(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '8px', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', marginTop: '4px' }}
                 />
               </label>
             </div>
@@ -234,68 +284,115 @@ function App() {
               onChange={(e) => setDescripcion(e.target.value)}
               required
               rows="5"
-              style={{ width: '100%', padding: '8px', marginTop: '4px', resize: 'vertical' }}
+              style={{ width: '100%', padding: '10px', marginTop: '4px', resize: 'vertical' }}
             />
           </label>
         </div>
 
-        <button type="submit" style={{ padding: '10px 16px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label>
+            Foto de la carta:
+            <br />
+            <input
+              id="imagenCarta"
+              type="file"
+              accept="image/*"
+              onChange={manejarCambioImagen}
+              style={{ marginTop: '8px' }}
+            />
+          </label>
+        </div>
+
+        {imagen && (
+          <div style={{ marginBottom: '16px' }}>
+            <p>Vista previa:</p>
+            <img
+              src={imagen}
+              alt="Vista previa"
+              style={{
+                width: '180px',
+                height: '250px',
+                objectFit: 'cover',
+                borderRadius: '10px',
+                border: '1px solid #444'
+              }}
+            />
+          </div>
+        )}
+
+        <button type="submit" style={{ padding: '10px 16px', cursor: 'pointer' }}>
           Crear carta
         </button>
       </form>
 
-      <h2>Lista de Cartas</h2>
+      <h2 style={{ marginBottom: '20px' }}>Colección de Cartas</h2>
 
       {cartas.length === 0 ? (
         <p>No hay cartas creadas todavía.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '24px'
+          }}
+        >
           {cartas.map((carta) => (
-            <li
+            <div
               key={carta.id}
               style={{
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                padding: '16px',
-                marginBottom: '16px'
+                background: '#1f2533',
+                border: '1px solid #343c4f',
+                borderRadius: '12px',
+                padding: '14px',
+                textAlign: 'center',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
               }}
             >
-              <strong>{carta.nombre}</strong>
-              <br />
-              ID: {carta.id}
-              <br />
-              Tipo de carta: {carta.tipo}
-              <br />
-
-              {carta.tipo === 'jugador' ? (
-                <>
-                  Equipo: {carta.equipo}
-                  <br />
-                  Arma: {carta.arma}
-                  <br />
-                  Poder: {carta.poder}
-                  <br />
-                </>
+              {carta.imagen ? (
+                <img
+                  src={carta.imagen}
+                  alt={carta.nombre}
+                  style={{
+                    width: '100%',
+                    height: '280px',
+                    objectFit: 'cover',
+                    borderRadius: '10px',
+                    marginBottom: '12px'
+                  }}
+                />
               ) : (
-                <>
-                  Tipo: {carta.tipoArma}
-                  <br />
-                  Bonificador: {carta.bonificador}
-                  <br />
-                </>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '280px',
+                    borderRadius: '10px',
+                    marginBottom: '12px',
+                    background: '#2c3445',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#bbb'
+                  }}
+                >
+                  Sin imagen
+                </div>
               )}
 
-              Descripción:
-              <br />
-              <span style={{ whiteSpace: 'pre-wrap' }}>{carta.descripcion}</span>
-              <br />
-              <br />
-              <button onClick={() => eliminarCarta(carta.id)}>
+              <h3 style={{ margin: '0 0 12px 0', fontSize: '1.4rem' }}>{carta.nombre}</h3>
+
+              <button
+                onClick={() => eliminarCarta(carta.id)}
+                style={{
+                  padding: '8px 12px',
+                  cursor: 'pointer'
+                }}
+              >
                 Eliminar
               </button>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
